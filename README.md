@@ -21,6 +21,40 @@ It's nice to write something in RoR ways.
 
 I hope you'll enjoy this template
 
+# Example
+
+Run:
+```bash
+./run.sh app
+
+// Run with Docs:
+ENABLE_DOCUMENT=true ./run.sh app
+```
+
+Generate Docs (*`swaggo`*):
+```bash
+cd app; ./generateDocs.sh; cd ..
+```
+
+CLI:
+```bash
+// Help
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh help
+
+// Make
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:model
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:migration
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:seeder
+
+// Migrate
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate:rollback
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate:refresh
+
+// Seed
+DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh seed
+```
+
 # Mod Dependencies/Suggestions
 
 ## WSGI/Routing/Auth
