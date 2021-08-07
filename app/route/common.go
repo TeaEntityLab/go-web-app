@@ -13,10 +13,6 @@ import (
 )
 
 const (
-	KeyCacheLinkWithUniqueKey = "LINK_%s"
-
-	ErrorHTTPFailureDataCenterServerUpdateModelByIDs = 200100
-
 	COMMON_RESPONSE_CODE_SUCCESS                   = 0
 	COMMON_RESPONSE_CODE_SUCCESS_STR               = "0"
 	COMMON_RESPONSE_CODE_BAD_REQUEST               = 400
