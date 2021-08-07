@@ -1,0 +1,270 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "description": "Check username \u0026 password by json",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Check the username \u0026 password correctness for login",
+                "operationId": "check-username-password-by-json",
+                "parameters": [
+                    {
+                        "description": "Login Form",
+                        "name": "loginForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthLogin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/route.CommonTokenResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/renew": {
+            "post": {
+                "description": "Renew authToken to avoid expirations by old authToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Renew authToken to avoid expirations",
+                "operationId": "renew-auth-token-by-auth-token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/route.CommonTokenResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/route.CommonErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.AuthLogin": {
+            "type": "object",
+            "properties": {
+                "account_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.AuthToken": {
+            "type": "object",
+            "properties": {
+                "aud": {
+                    "type": "string"
+                },
+                "exp": {
+                    "type": "integer"
+                },
+                "iat": {
+                    "type": "integer"
+                },
+                "iss": {
+                    "type": "string"
+                },
+                "jti": {
+                    "type": "string"
+                },
+                "nbf": {
+                    "type": "integer"
+                },
+                "sub": {
+                    "type": "string"
+                },
+                "ttl": {
+                    "type": "integer"
+                },
+                "userID": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "route.CommonErrorResponse": {
+            "type": "object",
+            "properties": {
+                "authToken": {
+                    "$ref": "#/definitions/model.AuthToken"
+                },
+                "code": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "details": {
+                    "type": "object"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "request_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_message": {
+                    "type": "string"
+                }
+            }
+        },
+        "route.CommonTokenResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "request_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_message": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+package migration
+
+import (
+	"gorm.io/gorm"
+
+	"github.com/go-gormigrate/gormigrate/v2"
+)
+
+func migration_{{datetime}}_{{actionName}}_{{migrationName}}() {
+	migrations = append(migrations,
+		&gormigrate.Migration{
+			ID: "{{datetime}}",
+			Migrate: func(tx *gorm.DB) error {
+				return nil
+			},
+			Rollback: func(tx *gorm.DB) error {
+				return nil
+			},
+		})
+}

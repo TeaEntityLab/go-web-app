@@ -1,0 +1,27 @@
+package model
+
+// Created: {{datetimeRaw}}
+
+type {{modelName}} struct {
+	BaseModel
+
+	Description string `json:"description"`
+
+	CreatedBy string `json:"created_by"`
+	UpdatedBy string `json:"updated_by"`
+}
+
+// TableName Show the name for Gorm
+func (model {{modelName}}) TableName() string {
+	return "{{modelName}}"
+}
+
+// ModelName Show the name of this Loggable
+func (model {{modelName}}) ModelName() string {
+	return "{{modelName}}"
+}
+
+// ModelID Show the ID of this Loggable
+func (model {{modelName}}) ModelID() string {
+	return model.UUID
+}

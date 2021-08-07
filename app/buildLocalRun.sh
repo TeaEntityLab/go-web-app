@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+BINARY="App_local"
+
+#if ! CGO_ENABLED=0 go build -i -o $BINARY ; then
+if ! CGO_ENABLED=1 go build -i -o $BINARY ; then
+    echo "\nCompilation ERROR\n"
+    exit 1
+fi
+echo "\nCompilation complete without error.\n"
+
+JWT_TOKEN_PRIVATEKEY_PATH="${JWT_TOKEN_PRIVATEKEY_PATH:-asset/mock/fake_rsa}"
+JWT_TOKEN_PUBLICKEY_PATH="${JWT_TOKEN_PUBLICKEY_PATH:-asset/mock/fake_rsa.pub}"
+DB_TYPE="${DB_TYPE:-sqlite}"
+DB_ENDPOINTS="${DB_ENDPOINTS:-mydb.sqlite3}"
+REDIS_ENDPOINTS="${REDIS_ENDPOINTS:-localhost:6379}"
+DB_ENDPOINTS=$DB_ENDPOINTS DB_TYPE=$DB_TYPE REDIS_ENDPOINTS=$REDIS_ENDPOINTS JWT_TOKEN_PRIVATEKEY_PATH=$JWT_TOKEN_PRIVATEKEY_PATH JWT_TOKEN_PUBLICKEY_PATH=$JWT_TOKEN_PUBLICKEY_PATH ./$BINARY

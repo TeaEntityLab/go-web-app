@@ -1,0 +1,171 @@
+definitions:
+  model.AuthLogin:
+    properties:
+      account_name:
+        type: string
+      password:
+        type: string
+      user_name:
+        type: string
+    type: object
+  model.AuthToken:
+    properties:
+      aud:
+        type: string
+      exp:
+        type: integer
+      iat:
+        type: integer
+      iss:
+        type: string
+      jti:
+        type: string
+      nbf:
+        type: integer
+      sub:
+        type: string
+      ttl:
+        type: integer
+      user_name:
+        type: string
+      userID:
+        type: string
+    type: object
+  route.CommonErrorResponse:
+    properties:
+      authToken:
+        $ref: '#/definitions/model.AuthToken'
+      code:
+        type: integer
+      count:
+        type: integer
+      data:
+        type: object
+      details:
+        type: object
+      error:
+        type: string
+      ip:
+        type: string
+      request_id:
+        type: string
+      status:
+        type: string
+      status_message:
+        type: string
+    type: object
+  route.CommonTokenResponse:
+    properties:
+      code:
+        type: integer
+      count:
+        type: integer
+      data:
+        type: object
+      request_id:
+        type: string
+      status:
+        type: string
+      status_message:
+        type: string
+      title:
+        type: string
+      token:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Check username & password by json
+      operationId: check-username-password-by-json
+      parameters:
+      - description: Login Form
+        in: body
+        name: loginForm
+        required: true
+        schema:
+          $ref: '#/definitions/model.AuthLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/route.CommonTokenResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "401":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "403":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+      summary: Check the username & password correctness for login
+  /api/v1/auth/renew:
+    post:
+      consumes:
+      - application/json
+      description: Renew authToken to avoid expirations by old authToken
+      operationId: renew-auth-token-by-auth-token
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/route.CommonTokenResponse'
+            - properties:
+                data:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "401":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "403":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/route.CommonErrorResponse'
+      summary: Renew authToken to avoid expirations
+swagger: "2.0"

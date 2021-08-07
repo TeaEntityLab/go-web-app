@@ -1,0 +1,19 @@
+package seeder
+
+import ()
+
+type {{seederName}} struct {}
+
+func (seeder {{seederName}}) Run() error {
+	return nil
+}
+
+func (seeder {{seederName}}) SeederName() string {
+	return "{{seederName}}"
+}
+
+func seeder_{{datetime}}_{{actionName}}_{{seederName}}() {
+	seeder := {{seederName}}{}
+    seederMap["{{seederName}}"] = seeder
+    seeders = append(seeders, seeder)
+}
