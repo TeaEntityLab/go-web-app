@@ -27,7 +27,7 @@ Run:
 ```bash
 ./run.sh app
 
-// Run with Docs:
+# Run with Docs:
 ENABLE_DOCUMENT=true ./run.sh app
 ```
 
@@ -38,20 +38,20 @@ cd app; ./generateDocs.sh; cd ..
 
 CLI:
 ```bash
-// Help
+# Help
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh help
 
-// Make
+# Make
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:model
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:migration
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh make:seeder
 
-// Migrate
+# Migrate
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate:rollback
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh migrate:refresh
 
-// Seed
+# Seed
 DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh seed
 ```
 
