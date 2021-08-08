@@ -10,8 +10,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"go-web-app/db"
 	"github.com/go-gormigrate/gormigrate/v2"
+	"go-web-app/db"
 )
 
 var (

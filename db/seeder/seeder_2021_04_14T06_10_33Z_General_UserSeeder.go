@@ -22,7 +22,7 @@ func (seeder UserSeeder) Run() error {
 	userRepository := repository.NewUserRepository(databaseSession)
 
 	userNameList := []struct {
-		UserName    string
+		UserName string
 	}{
 		{USER_NAME_ADMIN},
 	}
@@ -38,8 +38,8 @@ func (seeder UserSeeder) Run() error {
 		defaultPassword, err = serviceAuth.GenerateLoginHashedPassword("admin")
 
 		newUser := &model.User{
-			UserName:  userName,
-			Password:  defaultPassword,
+			UserName: userName,
+			Password: defaultPassword,
 
 			RoleNames: permissionUtils.ROLE_DEFAULT_ADMIN,
 		}

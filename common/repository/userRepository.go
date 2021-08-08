@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	lru "go-web-app/thirdparty/golang-lru"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	lru "go-web-app/thirdparty/golang-lru"
 
 	mod "go-web-app/common/model"
 	"go-web-app/common/util/gormutils"
@@ -491,7 +491,7 @@ func (repo UserRepository) setField(fieldName string, value interface{}, userIDs
 func (repo UserRepository) setFieldByUserName(fieldName string, value interface{}, userName string) (int64, error) {
 
 	commonStatement := gormutils.GetModelCommonQuery(repo.databaseSession, repo.modelUser, map[string]interface{}{
-		userAttributeUserNameFieldName:  userName,
+		userAttributeUserNameFieldName: userName,
 	})
 
 	return repo.setFieldRaw(commonStatement, fieldName, value)
