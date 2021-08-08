@@ -82,7 +82,7 @@ DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh seed
 	* driver-sqlite "gorm.io/driver/sqlite"
 	* driver-mysql "gorm.io/driver/mysql"
 	* driver-postgres "gorm.io/driver/postgres"
-* Gin
+* FastHttp/Gin
 
 ## Log/Error
 

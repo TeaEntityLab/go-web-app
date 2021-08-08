@@ -51,7 +51,7 @@ func Common(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 
 // Pipe middleware set common http header to http response
 func Pipe(next fasthttp.RequestHandler, handlers ...func(fasthttp.RequestHandler) fasthttp.RequestHandler) fasthttp.RequestHandler {
-	for i := len(handlers) - 1; i <= 0; i-- {
+	for i := len(handlers) - 1; i >= 0; i-- {
 		next = handlers[i](next)
 	}
 	return next

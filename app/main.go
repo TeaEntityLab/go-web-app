@@ -120,7 +120,7 @@ func main() {
 	})
 
 	apiV1 := r.Group("/api/v1")
-	apiV1.POST("/auth/login", route.CheckUsernamePasswordHTTPAPIHandler)
+	apiV1.POST("/auth/login", commonMiddlewares(route.CheckUsernamePasswordHTTPAPIHandler))
 
 	authMiddleware := func(next fasthttp.RequestHandler) fasthttp.RequestHandler {
 		return middleware.Auth(
