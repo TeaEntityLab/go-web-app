@@ -49,33 +49,6 @@ func (repo UserRepository) EnsureIndex() error {
 
 	repo.databaseSession.AutoMigrate(repo.modelUser, repo.modelRole)
 
-	//repo.userPool.Create(&mgo.CollectionInfo{})
-	//// Separated
-	//err = doEnsureIndex(repo.userPool, []string{
-	//	"-" + createdAtFieldName,
-	//	userAttributeFreezedFieldName,
-	//}, false, true, true)
-	//// Unique
-	//err = doEnsureIndex(repo.userPool, []string{
-	//	userUsernameFieldName,
-	//}, true, false, true)
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
-	//// TextSearch
-	//err = doEnsureIndexForTextSearch(repo.userPool, repo.TextSearchIndexes())
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
-	//
-	//repo.rolePool.Create(&mgo.CollectionInfo{})
-	//// Unique
-	//err = doEnsureIndex(repo.rolePool, []string{
-	//	roleNameFieldName,
-	//}, true, false, true)
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
 	repo.EnsureRoles()
 
 	return nil

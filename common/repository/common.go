@@ -232,13 +232,6 @@ func InitCacheWithSizeAndExpiration(size int, expiration time.Duration) *lru.Cac
 }
 
 func SetDebug(isOn bool) {
-	//var logger MongoLog
-	//if isOn {
-	//	logger = MongoLog{}
-	//}
-	//
-	//mgo.SetDebug(isOn)
-	//mgo.SetLogger(logger)
 }
 
 //// IsNotFound ...
