@@ -20,6 +20,7 @@ func (seeder UserSeeder) Run() error {
 
 	databaseSession := db.GetDefaultDatabase()
 	userRepository := repository.NewUserRepository(databaseSession)
+	userRepository.EnsureIndex()
 
 	userNameList := []struct {
 		UserName string
