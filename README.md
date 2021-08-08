@@ -2,7 +2,21 @@
 go-web-app
 ==
 
+[![tag](https://img.shields.io/github/tag/TeaEntityLab/go-web-app.svg)](https://github.com/TeaEntityLab/go-web-app)
+[![Go Report Card](https://goreportcard.com/badge/github.com/TeaEntityLab/go-web-app)](https://goreportcard.com/report/github.com/TeaEntityLab/go-web-app)
+[![codecov](https://codecov.io/gh/TeaEntityLab/go-web-app/branch/master/graph/badge.svg)](https://codecov.io/gh/TeaEntityLab/go-web-app)
+[![Travis CI Build Status](https://travis-ci.com/TeaEntityLab/go-web-app.svg?branch=master)](https://travis-ci.com/TeaEntityLab/go-web-app)
+[![GoDoc](https://godoc.org/github.com/TeaEntityLab/go-web-app?status.svg)](https://godoc.org/github.com/TeaEntityLab/go-web-app)
+
+[![license](https://img.shields.io/github/license/TeaEntityLab/go-web-app.svg?style=social&label=License)](https://github.com/TeaEntityLab/go-web-app)
+[![stars](https://img.shields.io/github/stars/TeaEntityLab/go-web-app.svg?style=social&label=Stars)](https://github.com/TeaEntityLab/go-web-app)
+[![forks](https://img.shields.io/github/forks/TeaEntityLab/go-web-app.svg?style=social&label=Fork)](https://github.com/TeaEntityLab/go-web-app)
+
 A web app template and Cli with structures inspired by RoR/Laravel/AdonisJS.
+
+[Branch: FastHttp](https://github.com/TeaEntityLab/go-web-app)
+
+[Branch: Gin](https://github.com/TeaEntityLab/go-web-app/tree/for_gin)
 
 # Features
 
