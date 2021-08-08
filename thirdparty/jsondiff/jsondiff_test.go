@@ -43,7 +43,7 @@ func TestCompareFloatsWithEpsilon(t *testing.T) {
 
 	opts := DefaultConsoleOptions()
 	opts.PrintTypes = false
-	opts.CompareNumbers = func(an, bn json.Number) bool {
+	opts.CompareNumbers = func(an, bn jsoniter.Number) bool {
 		a, err1 := an.Float64()
 		b, err2 := bn.Float64()
 		if err1 != nil || err2 != nil {

@@ -5,9 +5,9 @@ package model
 type User struct {
 	BaseModel
 
-	UserName   string  `json:"user_name" gorm:"index:index_user_user_name,unique;index:index_user_user_name;not null"`
-	Password   string  `json:"password"`
-	Freezed    bool    `json:"freezed"`
+	UserName string `json:"user_name" gorm:"index:index_user_user_name,unique;index:index_user_user_name;not null"`
+	Password string `json:"password"`
+	Freezed  bool   `json:"freezed"`
 
 	RoleNames string `json:"role_names"`
 

@@ -5,10 +5,10 @@ package docs
 
 import (
 	"bytes"
-	"encoding/json"
 	"strings"
 
 	"github.com/alecthomas/template"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/swaggo/swag"
 )
 
@@ -313,7 +313,7 @@ func (s *s) ReadDoc() string {
 
 	t, err := template.New("swagger_info").Funcs(template.FuncMap{
 		"marshal": func(v interface{}) string {
-			a, _ := json.Marshal(v)
+			a, _ := jsoniter.Marshal(v)
 			return string(a)
 		},
 	}).Parse(doc)

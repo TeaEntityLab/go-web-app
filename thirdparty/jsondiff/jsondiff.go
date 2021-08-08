@@ -59,7 +59,7 @@ type Options struct {
 	ChangedSeparator string
 	// When provided, this function will be used to compare two numbers. By default numbers are compared using their
 	// literal representation byte by byte.
-	CompareNumbers func(a, b json.Number) bool
+	CompareNumbers func(a, b jsoniter.Number) bool
 }
 
 // Provides a set of options in JSON format that are fully parseable.
@@ -105,7 +105,7 @@ type context struct {
 	diff    Difference
 }
 
-func (ctx *context) compareNumbers(a, b json.Number) bool {
+func (ctx *context) compareNumbers(a, b jsoniter.Number) bool {
 	if ctx.opts.CompareNumbers != nil {
 		return ctx.opts.CompareNumbers(a, b)
 	} else {
@@ -137,7 +137,7 @@ func (ctx *context) writeValue(v interface{}, full bool) {
 	switch vv := v.(type) {
 	case bool:
 		ctx.buf.WriteString(strconv.FormatBool(vv))
-	case json.Number:
+	case jsoniter.Number:
 		ctx.buf.WriteString(string(vv))
 	case string:
 		ctx.buf.WriteString(strconv.Quote(vv))
@@ -204,7 +204,7 @@ func (ctx *context) writeType(v interface{}) {
 	switch v.(type) {
 	case bool:
 		ctx.buf.WriteString("(boolean)")
-	case json.Number:
+	case jsoniter.Number:
 		ctx.buf.WriteString("(number)")
 	case string:
 		ctx.buf.WriteString("(string)")
@@ -277,8 +277,8 @@ func (ctx *context) printDiff(a, b interface{}) {
 		}
 	case reflect.String:
 		switch aa := a.(type) {
-		case json.Number:
-			bb, ok := b.(json.Number)
+		case jsoniter.Number:
+			bb, ok := b.(jsoniter.Number)
 			if !ok || !ctx.compareNumbers(aa, bb) {
 				ctx.printMismatch(a, b)
 				ctx.result(NoMatch)
@@ -418,9 +418,9 @@ func (ctx *context) printDiff(a, b interface{}) {
 // to be machine readable.
 func Compare(a, b []byte, opts *Options) (Difference, string) {
 	var av, bv interface{}
-	da := json.NewDecoder(bytes.NewReader(a))
+	da := jsoniter.NewDecoder(bytes.NewReader(a))
 	da.UseNumber()
-	db := json.NewDecoder(bytes.NewReader(b))
+	db := jsoniter.NewDecoder(bytes.NewReader(b))
 	db.UseNumber()
 	errA := da.Decode(&av)
 	errB := db.Decode(&bv)

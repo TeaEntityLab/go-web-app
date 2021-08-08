@@ -8,9 +8,9 @@ import (
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	lru "go-web-app/thirdparty/golang-lru"
 	"gopkg.in/redis.v5"
 	"gorm.io/gorm"
-	lru "go-web-app/thirdparty/golang-lru"
 
 	"go-web-app/common/model"
 	"go-web-app/common/model/modelchecker"
@@ -117,7 +117,6 @@ func NewSortFieldByString(status string) SortField {
 }
 
 var (
-
 	ConnectionDuration time.Duration
 
 	defaultRedisClient *redis.Cmdable
@@ -161,7 +160,6 @@ const (
 	// Role
 	roleNameFieldName        = "name"
 	rolePermissionsFieldName = "permissions"
-
 )
 
 // GetRedisClientDefault ...
@@ -234,13 +232,6 @@ func InitCacheWithSizeAndExpiration(size int, expiration time.Duration) *lru.Cac
 }
 
 func SetDebug(isOn bool) {
-	//var logger MongoLog
-	//if isOn {
-	//	logger = MongoLog{}
-	//}
-	//
-	//mgo.SetDebug(isOn)
-	//mgo.SetLogger(logger)
 }
 
 //// IsNotFound ...

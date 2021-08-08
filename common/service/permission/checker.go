@@ -11,15 +11,15 @@ import (
 type UserPermissionRequestInfo struct {
 	AuthToken *mod.AuthToken
 
-	UserID    string
+	UserID string
 
-	UserRepo    *repo.UserRepository
+	UserRepo *repo.UserRepository
 }
 
 type UserPermissionGrantedInfo struct {
 	Info *UserPermissionRequestInfo
 
-	Global  *mod.CachedPermission
+	Global *mod.CachedPermission
 }
 
 // CheckUserPermissionsByRequestInfo ...

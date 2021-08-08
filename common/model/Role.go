@@ -32,7 +32,7 @@ type CachedPermissionEntry struct {
 
 	UserID string
 
-	Global  *CachedPermission
+	Global *CachedPermission
 	Tenant map[string]*CachedPermission
 }
 

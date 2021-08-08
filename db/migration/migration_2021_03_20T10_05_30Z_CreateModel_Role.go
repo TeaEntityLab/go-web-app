@@ -7,15 +7,15 @@ import (
 	mod "go-web-app/common/model"
 )
 
-func migration_2021_03_19T10_05_30Z_CreateModel_User() {
+func migration_2021_03_20T10_05_30Z_CreateModel_Role() {
 	migrations = append(migrations,
 		&gormigrate.Migration{
-			ID: "2021_03_19T10_05_30Z",
+			ID: "2021_03_20T10_05_30Z",
 			Migrate: func(tx *gorm.DB) error {
-				return tx.AutoMigrate(&mod.User{})
+				return tx.AutoMigrate(&mod.Role{})
 			},
 			Rollback: func(tx *gorm.DB) error {
-				return tx.Migrator().DropTable(&mod.User{})
+				return tx.Migrator().DropTable(&mod.Role{})
 			},
 		})
 }

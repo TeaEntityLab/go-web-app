@@ -3,13 +3,11 @@ package serviceLog
 import (
 	"github.com/sirupsen/logrus"
 	// "gorm.io/gorm"
-
 	// repo "go-web-app/common/repository"
 )
 
 // Constant values
-const (
-)
+const ()
 
 var (
 	DebugMode = false

@@ -2,12 +2,12 @@ package model
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
 
 	//"github.com/golang/protobuf/proto"
+	jsoniter "github.com/json-iterator/go"
 	"gorm.io/gorm"
 )
 
@@ -63,7 +63,7 @@ func UnmarshalJSONEnum(m map[string]int32, data []byte, enumName string) (int32,
 	if data[0] == '"' {
 		// New style: enums are strings.
 		var repr string
-		if err := json.Unmarshal(data, &repr); err != nil {
+		if err := jsoniter.Unmarshal(data, &repr); err != nil {
 			return -1, err
 		}
 		val, ok := m[repr]
@@ -74,7 +74,7 @@ func UnmarshalJSONEnum(m map[string]int32, data []byte, enumName string) (int32,
 	}
 	// Old style: enums are ints.
 	var val int32
-	if err := json.Unmarshal(data, &val); err != nil {
+	if err := jsoniter.Unmarshal(data, &val); err != nil {
 		return 0, fmt.Errorf("cannot unmarshal %#q into enum %s", data, enumName)
 	}
 	return val, nil

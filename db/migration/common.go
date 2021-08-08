@@ -10,8 +10,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"go-web-app/db"
 	"github.com/go-gormigrate/gormigrate/v2"
+	"go-web-app/db"
 )
 
 var (
@@ -116,7 +116,7 @@ func MigrateRollback(steps int) error {
 			return err
 		}
 		if err == gormigrate.ErrNoRunMigration {
-			logrus.Printf("There's no more rollback avaiable.(remaining steps: %d)\n", steps)
+			logrus.Printf("There's no more rollback available.(remaining steps: %d)\n", steps)
 			return nil
 		}
 		logrus.Printf("Migration Rollback did run successfully\n")

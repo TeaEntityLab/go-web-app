@@ -11,11 +11,11 @@ import (
 	"github.com/caarlos0/env/v6"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	gormLogrus "github.com/onrik/gorm-logrus"
 	"github.com/sirupsen/logrus"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	gormlogger "gorm.io/gorm/logger"
-	gormLogrus "github.com/onrik/gorm-logrus"
 
 	"go-web-app/common/middleware"
 	"go-web-app/common/repository"
@@ -47,8 +47,8 @@ var (
 type Config struct {
 	db.CommonConfig
 
-	RedisEndpoints           string `json:"REDIS_ENDPOINTS" env:"REDIS_ENDPOINTS,required"`
-	ServicePort              string `json:"SERVICE_PORT" env:"SERVICE_PORT" envDefault:"8080"`
+	RedisEndpoints string `json:"REDIS_ENDPOINTS" env:"REDIS_ENDPOINTS,required"`
+	ServicePort    string `json:"SERVICE_PORT" env:"SERVICE_PORT" envDefault:"8080"`
 
 	JwtTokenPrivateKeyPath string `json:"JWT_TOKEN_PRIVATEKEY_PATH" env:"JWT_TOKEN_PRIVATEKEY_PATH,required"`
 	JwtTokenPublicKeyPath  string `json:"JWT_TOKEN_PUBLICKEY_PATH" env:"JWT_TOKEN_PUBLICKEY_PATH,required"`

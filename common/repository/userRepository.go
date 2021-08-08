@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	lru "go-web-app/thirdparty/golang-lru"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	lru "go-web-app/thirdparty/golang-lru"
 
 	mod "go-web-app/common/model"
 	"go-web-app/common/util/gormutils"
@@ -49,33 +49,6 @@ func (repo UserRepository) EnsureIndex() error {
 
 	repo.databaseSession.AutoMigrate(repo.modelUser, repo.modelRole)
 
-	//repo.userPool.Create(&mgo.CollectionInfo{})
-	//// Separated
-	//err = doEnsureIndex(repo.userPool, []string{
-	//	"-" + createdAtFieldName,
-	//	userAttributeFreezedFieldName,
-	//}, false, true, true)
-	//// Unique
-	//err = doEnsureIndex(repo.userPool, []string{
-	//	userUsernameFieldName,
-	//}, true, false, true)
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
-	//// TextSearch
-	//err = doEnsureIndexForTextSearch(repo.userPool, repo.TextSearchIndexes())
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
-	//
-	//repo.rolePool.Create(&mgo.CollectionInfo{})
-	//// Unique
-	//err = doEnsureIndex(repo.rolePool, []string{
-	//	roleNameFieldName,
-	//}, true, false, true)
-	//if err != nil {
-	//	return errors.WithMessage(err, "db error")
-	//}
 	repo.EnsureRoles()
 
 	return nil
@@ -286,7 +259,6 @@ func (repo UserRepository) RetrieveUserByUserName(withPassword bool, userName st
 		}
 	}
 
-	// get all AudienceGroup in UserAudienceGroupPool
 	filter := map[string]interface{}{}
 	userNameExisting := userName != ""
 	if userNameExisting {
@@ -491,7 +463,7 @@ func (repo UserRepository) setField(fieldName string, value interface{}, userIDs
 func (repo UserRepository) setFieldByUserName(fieldName string, value interface{}, userName string) (int64, error) {
 
 	commonStatement := gormutils.GetModelCommonQuery(repo.databaseSession, repo.modelUser, map[string]interface{}{
-		userAttributeUserNameFieldName:  userName,
+		userAttributeUserNameFieldName: userName,
 	})
 
 	return repo.setFieldRaw(commonStatement, fieldName, value)
