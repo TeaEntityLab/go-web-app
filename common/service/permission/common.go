@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"go-web-app/common/model"
-	errtrace "go-web-app/errtrace"
+	"go-web-app/errtrace"
 	lru "go-web-app/thirdparty/golang-lru"
 )
 

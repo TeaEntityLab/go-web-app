@@ -1,7 +1,7 @@
 package model
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type AuthToken struct {

@@ -3,11 +3,11 @@ package serviceAuth
 import (
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	bcrypt "golang.org/x/crypto/bcrypt"
+	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
 
 	mod "go-web-app/common/model"
-	errtrace "go-web-app/errtrace"
+	"go-web-app/errtrace"
 )
 
 // CheckAuthInfoValidation ...

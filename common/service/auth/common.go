@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	errtrace "go-web-app/errtrace"
+	"go-web-app/errtrace"
 )
 
 // Constant values

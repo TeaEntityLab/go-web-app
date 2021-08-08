@@ -25,7 +25,10 @@ func ReplaceTemplate(templateList []TemplateReplaceDef, replaceFunc func(string)
 	var err error
 	for _, item := range templateList {
 
-		fileutils.Copy(item.templatePath, item.targetPath)
+		err = fileutils.Copy(item.templatePath, item.targetPath)
+		if err != nil {
+			return err
+		}
 		var contentByte []byte
 		contentByte, err = ioutil.ReadFile(item.targetPath)
 		if err != nil {

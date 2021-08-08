@@ -36,10 +36,16 @@ var (
 				if err != nil {
 					return err
 				}
-				migration.Migrate()
+				err = migration.Migrate()
+				if err != nil {
+					return err
+				}
 
 				if c.Bool(FLAG_MIGRATION_SEED) {
-					seeder.GenerateSeederAutogenFile()
+					err = seeder.GenerateSeederAutogenFile()
+					if err != nil {
+						return err
+					}
 					err = seeder.SeedAll()
 					if err != nil {
 						return err
@@ -74,7 +80,10 @@ var (
 				if err != nil {
 					return err
 				}
-				migration.MigrateRollback(steps)
+				err = migration.MigrateRollback(steps)
+				if err != nil {
+					return err
+				}
 
 				return nil
 			},
@@ -100,12 +109,21 @@ var (
 				if err != nil {
 					return err
 				}
-				migration.MigrateRollback(99999)
-				migration.Migrate()
+				err = migration.MigrateRollback(99999)
+				if err != nil {
+					return err
+				}
+				err = migration.Migrate()
+				if err != nil {
+					return err
+				}
 				//app.Command("migrate").Run(c)
 
 				if c.Bool(FLAG_MIGRATION_SEED) {
-					seeder.GenerateSeederAutogenFile()
+					err = seeder.GenerateSeederAutogenFile()
+					if err != nil {
+						return err
+					}
 					err = seeder.SeedAll()
 					if err != nil {
 						return err

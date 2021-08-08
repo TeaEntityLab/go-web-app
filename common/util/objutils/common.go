@@ -23,7 +23,7 @@ func ReplaceFormat(format string, p map[string]interface{}) string {
 }
 
 func DeduplicateStringSlice(list []string) []string {
-	result := []string{}
+	var result []string
 	hashmap := map[string]bool{}
 
 	for _, item := range list {

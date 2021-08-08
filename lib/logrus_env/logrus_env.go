@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	logrus "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 var (

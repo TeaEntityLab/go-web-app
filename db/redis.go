@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	hashring "github.com/serialx/hashring"
+	"github.com/serialx/hashring"
 	log "github.com/sirupsen/logrus"
-	redis "gopkg.in/redis.v5"
+	"gopkg.in/redis.v5"
 )
 
 func ParseRedisConnectionString(connStr string) ([]string, int) {

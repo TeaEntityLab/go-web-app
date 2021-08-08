@@ -89,7 +89,7 @@ func CheckLoginStatus(c *fasthttp.RequestCtx) (*model.AuthToken, *errtrace.Error
 	}
 	authToken, checkErr := authService.CheckAuthTokenValidation(authTokenJWTString)
 	if authToken == nil || checkErr != nil {
-		if checkErr.ErrCode == authService.ErrorAuthTokenInvalidEmpty {
+		if checkErr != nil && checkErr.ErrCode == authService.ErrorAuthTokenInvalidEmpty {
 			response := ResponseAuthError(
 				c,
 				checkErr.ErrCode,
@@ -98,7 +98,7 @@ func CheckLoginStatus(c *fasthttp.RequestCtx) (*model.AuthToken, *errtrace.Error
 
 			return nil, &response
 		}
-		if checkErr.ErrCode == authService.ErrorAuthTokenInvalidTtlTimeout {
+		if checkErr != nil && checkErr.ErrCode == authService.ErrorAuthTokenInvalidTtlTimeout {
 			response := ResponseAuthError(
 				c,
 				checkErr.ErrCode,
@@ -107,7 +107,7 @@ func CheckLoginStatus(c *fasthttp.RequestCtx) (*model.AuthToken, *errtrace.Error
 
 			return nil, &response
 		}
-		if checkErr.ErrCode == authService.ErrorAuthTokenInvalidDecodeError {
+		if checkErr != nil && checkErr.ErrCode == authService.ErrorAuthTokenInvalidDecodeError {
 			response := ResponseAuthError(
 				c,
 				checkErr.ErrCode,
