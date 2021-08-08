@@ -259,7 +259,6 @@ func (repo UserRepository) RetrieveUserByUserName(withPassword bool, userName st
 		}
 	}
 
-	// get all AudienceGroup in UserAudienceGroupPool
 	filter := map[string]interface{}{}
 	userNameExisting := userName != ""
 	if userNameExisting {
