@@ -11,15 +11,15 @@ import (
 type UserPermissionRequestInfo struct {
 	AuthToken *mod.AuthToken
 
-	UserID    string
+	UserID string
 
-	UserRepo    *repo.UserRepository
+	UserRepo *repo.UserRepository
 }
 
 type UserPermissionGrantedInfo struct {
 	Info *UserPermissionRequestInfo
 
-	Global  *mod.CachedPermission
+	Global *mod.CachedPermission
 }
 
 // CheckUserPermissionsByRequestInfo ...
@@ -88,8 +88,8 @@ func GetGlobalPermissionsByUserID(userRepo *repo.UserRepository, userID string) 
 		// 	"code":   500,
 		// 	"status": 500,
 		// }
-		// log.WithFields(fields).Errorf("c.Request.URL.Path: %v", c.Request.URL.Path)
-		// c.AbortWithStatusJSON(http.StatusInternalServerError, fields)
+		// log.WithFields(fields).Errorf("string(c.Request.URI().Path()): %v", string(c.Request.URI().Path()))
+		// httputils.DoJSONWrite(c, http.StatusInternalServerError, fields)
 		// return
 		return nil, retrieveUserByUserIDErr
 	}

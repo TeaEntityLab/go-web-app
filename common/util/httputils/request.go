@@ -1,4 +1,4 @@
-package ginutils
+package httputils
 
 import (
 	"fmt"
@@ -14,27 +14,27 @@ import (
 	"go-web-app/errtrace"
 )
 
-func GetHttpRequestInfo(r *http.Request) *model.HTTPRequestInfo {
+func GetHttpRequestInfo(r *fasthttp.RequestCtx) *model.HTTPRequestInfo {
 	return &model.HTTPRequestInfo{
-		Remote:        r.RemoteAddr,
-		Method:        r.Method,
-		RequestURI:    r.RequestURI,
-		Protocol:      r.Proto,
-		Host:          r.Host,
-		ContentLength: r.ContentLength,
-		Referer:       r.Referer(),
-		UserAgent:     r.UserAgent(),
+		Remote:        r.RemoteAddr().String(),
+		Method:        string(r.Method()),
+		RequestURI:    string(r.RequestURI()),
+		Protocol:      string(r.Request.Header.Protocol()),
+		Host:          string(r.Host()),
+		ContentLength: int64(r.Request.Header.ContentLength()),
+		Referer:       string(r.Referer()),
+		UserAgent:     string(r.UserAgent()),
 	}
 }
 
 // NewHttpLogger
 // field names in httpRequest map fields should follow Stackdriver Logging API v2 HttpRequest
 // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#HttpRequest
-func NewHttpLogger(logger *logrus.Entry, r *http.Request) *logrus.Entry {
+func NewHttpLogger(logger *logrus.Entry, r *fasthttp.RequestCtx) *logrus.Entry {
 	return logger.WithField("httpRequest", map[string]interface{}{
 		"requestMethod": r.Method,
 		"requestUrl":    r.RequestURI,
-		"requestSize":   r.ContentLength,
+		"requestSize":   r.Request.Header.ContentLength,
 		//"status": number,
 		//"responseSize": string,
 		"userAgent": r.UserAgent(),
@@ -46,21 +46,23 @@ func NewHttpLogger(logger *logrus.Entry, r *http.Request) *logrus.Entry {
 		//"cacheHit": boolean,
 		//"cacheValidatedWithOriginServer": boolean,
 		//"cacheFillBytes": string,
-		"protocol": r.Proto,
+		//"protocol": r.Request.Proto,
+		"protocol": string(r.Request.Header.Protocol()),
 	})
 }
 
 // TryGetCookie ...
 func TryGetCookie(c *fasthttp.RequestCtx, name string) (string, error) {
-	targetCookie, cookieTokenErr := c.Request.Cookie(name)
-	if cookieTokenErr != nil {
-		return "", cookieTokenErr
-	}
+	targetCookie := string(c.Request.Header.Cookie(name))
+	//targetCookie, cookieTokenErr := c.Request.Header.Cookie(name)
+	//if cookieTokenErr != nil {
+	//	return "", cookieTokenErr
+	//}
 
 	var target string
 	var urlQueryUnescapeErr error
-	if targetCookie != nil {
-		target, urlQueryUnescapeErr = url.QueryUnescape(targetCookie.Value)
+	if targetCookie != "" {
+		target, urlQueryUnescapeErr = url.QueryUnescape(targetCookie)
 	}
 
 	return target, urlQueryUnescapeErr
@@ -145,7 +147,7 @@ func CheckLoginStatusOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, m
 		}
 
 		fields := logrus.Fields{
-			"ip":        ReadUserIP(c.Request),
+			"ip":        ReadUserIP(c),
 			"authToken": authToken,
 			"error":     checkLoginErrStr,
 
@@ -153,20 +155,20 @@ func CheckLoginStatusOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, m
 			"status": 401,
 		}
 		funcLogger.WithFields(fields).Infof(messageOnError)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, fields)
+		DoJSONWrite(c, http.StatusUnauthorized, fields)
 	}
 
 	return authToken, checkLoginErr
 }
 
 // ReadUserIP ...
-func ReadUserIP(r *http.Request) string {
-	IPAddress := r.Header.Get("X-Real-Ip")
+func ReadUserIP(r *fasthttp.RequestCtx) string {
+	IPAddress := string(r.Request.Header.Peek("X-Real-Ip"))
 	if IPAddress == "" {
-		IPAddress = r.Header.Get("X-Forwarded-For")
+		IPAddress = string(r.Request.Header.Peek("X-Forwarded-For"))
 	}
 	if IPAddress == "" {
-		IPAddress = r.RemoteAddr
+		IPAddress = r.RemoteAddr().String()
 	}
 	return IPAddress
 }

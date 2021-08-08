@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,11 +11,12 @@ import (
 
 	"github.com/caarlos0/env/v6"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/valyala/fasthttp"
+	"github.com/fasthttp/router"
 	gormLogrus "github.com/onrik/gorm-logrus"
 	"github.com/sirupsen/logrus"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	httpSwagger "github.com/swaggo/http-swagger"
+	"github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 	gormlogger "gorm.io/gorm/logger"
 
 	"go-web-app/common/middleware"
@@ -22,6 +24,7 @@ import (
 	routeCommon "go-web-app/common/route"
 	authService "go-web-app/common/service/auth"
 	serviceLog "go-web-app/common/service/log"
+	"go-web-app/common/util/httputils"
 	// servicePermission "go-web-app/common/service/permission"
 	_ "go-web-app/app/docs"
 	"go-web-app/app/route"
@@ -48,6 +51,7 @@ type Config struct {
 	db.CommonConfig
 
 	RedisEndpoints string `json:"REDIS_ENDPOINTS" env:"REDIS_ENDPOINTS,required"`
+	HostName       string `json:"HOST_NAME" env:"HOST_NAME" envDefault:"0.0.0.0"`
 	ServicePort    string `json:"SERVICE_PORT" env:"SERVICE_PORT" envDefault:"8080"`
 
 	JwtTokenPrivateKeyPath string `json:"JWT_TOKEN_PRIVATEKEY_PATH" env:"JWT_TOKEN_PRIVATEKEY_PATH,required"`
@@ -83,15 +87,19 @@ func main() {
 	}
 
 	route.Logger = logrus.WithField("object", "route")
-	r := gin.Default()
+	r := router.New()
 
 	//r.Use(static.ServeRoot("/static", "./web/static"))
-	r.Use(routeCommon.SimpleCORSMiddleware)
-	r.Use(func(c *fasthttp.RequestCtx) {
-		c.Set("dbClient", db.GetDefaultDatabase())
-		c.Set("cacheStore", repository.NewCacheStoreWithRedisClient(repository.GetRedisClientDefault(cfg.RedisEndpoints)))
-		c.Next()
-	})
+	utilsMiddleware := func(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+		return func(c *fasthttp.RequestCtx) {
+			c.SetUserValue("dbClient", db.GetDefaultDatabase())
+			c.SetUserValue("cacheStore", repository.NewCacheStoreWithRedisClient(repository.GetRedisClientDefault(cfg.RedisEndpoints)))
+			next(c)
+		}
+	}
+	commonMiddlewares := func(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+		return middleware.Pipe(next, routeCommon.SimpleCORSMiddleware, utilsMiddleware)
+	}
 
 	// GeneralAPI router group
 
@@ -103,43 +111,57 @@ func main() {
 
 	// Docker/Kubernetes health check
 	r.GET("/healthz", func(c *fasthttp.RequestCtx) {
-		c.String(http.StatusOK, http.StatusText(http.StatusOK))
+		httputils.DoJSONWrite(c, http.StatusOK, http.StatusText(http.StatusOK))
 	})
 
 	// Default Kubernetes L7 Loadbalancing health check
 	r.GET("/", func(c *fasthttp.RequestCtx) {
-		c.String(http.StatusOK, http.StatusText(http.StatusOK))
+		httputils.DoJSONWrite(c, http.StatusOK, http.StatusText(http.StatusOK))
 	})
 
 	apiV1 := r.Group("/api/v1")
 	apiV1.POST("/auth/login", route.CheckUsernamePasswordHTTPAPIHandler)
 
-	apiV1.Use(middleware.Auth(
-		route.Logger.WithField("middleware", "auth"),
-	//middleware.ExceptionalRoute{
-	//	Path:   "/auth/login",
-	//	Method: "POST",
-	//}
-	),
+	authMiddleware := func(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+		return middleware.Auth(
+			route.Logger.WithField("middleware", "auth"),
+			//middleware.ExceptionalRoute{
+			//	Path:   "/auth/login",
+			//	Method: "POST",
+			//}
+			next,
+		)
+	}
+
+	apiV1.POST("/auth/renew",
+		middleware.Pipe(
+			route.RenewAuthTokenHTTPAPIHandler,
+			commonMiddlewares, authMiddleware,
+		),
 	)
 
-	apiV1.POST("/auth/renew", route.RenewAuthTokenHTTPAPIHandler)
-
 	if cfg.EnableDocument == "true" {
-		r.GET(cfg.DocumentRouteGroup+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		//r.GET(cfg.DocumentRouteGroup+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		r.GET(cfg.DocumentRouteGroup+"/swagger/{filepath:*}", fasthttpadaptor.NewFastHTTPHandlerFunc(httpSwagger.WrapHandler))
 	}
 
 	//r.GET("/proxy/*url", func(c *fasthttp.RequestCtx) {
 	//	target := strings.TrimPrefix(c.Params.ByName("url"), "/")
-	//	ginutils.ReverseProxy(target)(c)
+	//	httputils.ReverseProxy(target)(c)
 	//})
 
 	// run the server
 
-	serverErr := r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	//serverErr := r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	serviceErr := fasthttp.ListenAndServe(
+		fmt.Sprintf(
+			"%s:%s", cfg.HostName, cfg.ServicePort,
+		),
+		r.Handler,
+	)
 
-	if serverErr != nil {
-		funcLogger.WithError(serverErr).Fatalf("gin.Engine.Run() error")
+	if serviceErr != nil {
+		funcLogger.WithError(serviceErr).Fatalf("fasthttp.ListenAndServe() error")
 	}
 }
 

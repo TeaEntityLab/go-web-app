@@ -82,28 +82,31 @@ var (
 	}, ", ")
 )
 
-func SimpleCORSMiddleware(c *fasthttp.RequestCtx) {
-	// If a request may contain a `Access-Control-Allow-Origin` with different values, then the host should always respond with `Vary: Origin`,
-	// even for responses without an `Access-Control-Allow-Origin` header.
-	// If the header isn't always present, it would be possible to fill the cache with incorrect values.
-	c.Response.Header.Add("Vary", "Origin")
+func SimpleCORSMiddleware(next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(c *fasthttp.RequestCtx) {
+		// If a request may contain a `Access-Control-Allow-Origin` with different values, then the host should always respond with `Vary: Origin`,
+		// even for responses without an `Access-Control-Allow-Origin` header.
+		// If the header isn't always present, it would be possible to fill the cache with incorrect values.
+		c.Response.Header.Add("Vary", "Origin")
 
-	// cors setting
-	origin := string(c.Request.Header.Peek("Origin"))
-	if origin == "" {
-		origin = "*"
-	}
-	c.Response.Header.Set("Access-Control-Allow-Origin", origin)
+		// cors setting
+		origin := string(c.Request.Header.Peek("Origin"))
+		if origin == "" {
+			origin = "*"
+		}
+		c.Response.Header.Set("Access-Control-Allow-Origin", origin)
 
-	c.Response.Header.Set("Access-Control-Max-Age", "86400")
-	c.Response.Header.Set("Access-Control-Allow-Methods", AccessControlAllowMethods)
-	c.Response.Header.Set("Access-Control-Allow-Headers", AccessControlAllowHeaders)
-	c.Response.Header.Set("Access-Control-Expose-Headers", "Content-Length")
-	c.Response.Header.Set("Access-Control-Allow-Credentials", "true")
+		c.Response.Header.Set("Access-Control-Max-Age", "86400")
+		c.Response.Header.Set("Access-Control-Allow-Methods", AccessControlAllowMethods)
+		c.Response.Header.Set("Access-Control-Allow-Headers", AccessControlAllowHeaders)
+		c.Response.Header.Set("Access-Control-Expose-Headers", "Content-Length")
+		c.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 
-	if string(c.Request.Header.Method()) == http.MethodOptions {
-		c.AbortWithStatus(200)
-	} else {
-		c.Next()
+		if string(c.Request.Header.Method()) == http.MethodOptions {
+			//c.AbortWithStatus(200)
+			c.SetStatusCode(200)
+		} else {
+			next(c)
+		}
 	}
 }

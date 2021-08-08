@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/valyala/fasthttp"
 	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
 
 	mod "go-web-app/common/model"
 	repo "go-web-app/common/repository"
@@ -79,7 +79,7 @@ func checkModelErrorOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, re
 		}
 
 		fields := logrus.Fields{
-			"ip":        ginutils.ReadUserIP(c.Request),
+			"ip":        httputils.ReadUserIP(c),
 			"authToken": authToken,
 			"error":     modelError.Error(),
 			"requestId": requestId,
@@ -89,8 +89,8 @@ func checkModelErrorOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, re
 		}
 		funcLogger.WithFields(fields).Errorf("db error")
 
-		c.AbortWithStatusJSON(httpStatus, CommonErrorResponse{
-			Ip:        ginutils.ReadUserIP(c.Request),
+		httputils.DoJSONWrite(c, httpStatus, CommonErrorResponse{
+			Ip:        httputils.ReadUserIP(c),
 			AuthToken: authToken,
 			Error:     modelError.Error(),
 			CommonResponse: CommonResponse{

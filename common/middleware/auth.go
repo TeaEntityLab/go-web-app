@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 
 	"github.com/rs/xid"
 	"github.com/sirupsen/logrus"
@@ -11,14 +10,14 @@ import (
 	"go-web-app/common/util/httputils"
 )
 
-// Auth general Auth checking
-func Auth(logger *logrus.Entry, exceptionalRoutes ...ExceptionalRoute) gin.HandlerFunc {
+// AuthWithExceptionRoutes general Auth checking
+func AuthWithExceptionRoutes(logger *logrus.Entry, next fasthttp.RequestHandler, exceptionalRoutes ...ExceptionalRoute) fasthttp.RequestHandler {
 	return func(c *fasthttp.RequestCtx) {
 
-		matchedPath, _ := c.Get("matchedPath")
+		matchedPath := c.UserValue("matchedPath")
 
 		matchedException := false
-		path := c.Request.URL.Path
+		path := string(c.Request.URI().Path())
 		method := string(c.Request.Header.Method())
 		for _, route := range exceptionalRoutes {
 			if (route.Path == path || route.Path == matchedPath) && route.Method == method {
@@ -27,22 +26,30 @@ func Auth(logger *logrus.Entry, exceptionalRoutes ...ExceptionalRoute) gin.Handl
 			}
 		}
 		if matchedException {
-			c.Next()
+			next(c)
 			return
 		}
 
+		Auth(logger, next)
+	}
+}
+
+// Auth general Auth checking
+func Auth(logger *logrus.Entry, next fasthttp.RequestHandler) fasthttp.RequestHandler {
+	return func(c *fasthttp.RequestCtx) {
+
 		requestXID := xid.New().String()
-		funcLogger := ginutils.NewHttpLogger(logger, c.Request).
+		funcLogger := httputils.NewHttpLogger(logger, c).
 			WithField("requestXID", requestXID).
 			WithField("func", "go-web-app.AuthMiddleware")
 
-		authToken, checkLoginErr := ginutils.CheckLoginStatusOrAbort(c, funcLogger, fmt.Sprintf("c.Request.URL.Path: %v", c.Request.URL.Path))
+		authToken, checkLoginErr := httputils.CheckLoginStatusOrAbort(c, funcLogger, fmt.Sprintf("string(c.Request.URI().Path()): %v", string(c.Request.URI().Path())))
 		if checkLoginErr != nil || authToken == nil {
 			return
 		}
 
-		c.Set("authToken", authToken)
+		c.SetUserValue("authToken", authToken)
 
-		c.Next()
+		next(c)
 	}
 }
