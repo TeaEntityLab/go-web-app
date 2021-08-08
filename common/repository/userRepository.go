@@ -47,9 +47,9 @@ func NewUserRepository(databaseSession *gorm.DB) UserRepository {
 // EnsureIndex ...
 func (repo UserRepository) EnsureIndex() error {
 
-	repo.databaseSession.AutoMigrate(repo.modelUser, repo.modelRole)
+	_ = repo.databaseSession.AutoMigrate(repo.modelUser, repo.modelRole)
 
-	repo.EnsureRoles()
+	_ = repo.EnsureRoles()
 
 	return nil
 }
@@ -78,9 +78,9 @@ func (repo UserRepository) EnsureRoles() error {
 		if len(roles) > 0 {
 			theRole := roles[0]
 			theRole.Permissions = role.Permissions
-			repo.UpdateRole(theRole.UUID, theRole)
+			_ = repo.UpdateRole(theRole.UUID, theRole)
 		} else {
-			repo.createRole(role)
+			_ = repo.createRole(role)
 		}
 	}
 
@@ -259,16 +259,18 @@ func (repo UserRepository) RetrieveUserByUserName(withPassword bool, userName st
 		}
 	}
 
-	filter := map[string]interface{}{}
+	var filter []clause.Expression
 	userNameExisting := userName != ""
 	if userNameExisting {
-		filter[userAttributeUserNameFieldName] = userName
+		filter = append(filter, clause.Eq{Column: userAttributeUserNameFieldName, Value: userName})
 	}
 	if !userNameExisting {
 		return nil, errors.New("Leak userName")
 	}
 
-	queryResult := repo.databaseSession.Preload(clause.Associations).Find(&user, filter)
+	targetModel := repo.modelUser
+	commonStatement := gormutils.GetModelCommonQuery(repo.databaseSession, targetModel, filter)
+	queryResult := commonStatement.Preload(clause.Associations).Find(&user)
 	if !withPassword {
 		repo.clearUserPassword(user)
 	}
@@ -360,7 +362,7 @@ func (repo UserRepository) ChangeUserFreezedStatus(freezed bool, userIDs ...stri
 func (repo UserRepository) getAllUsersAndCountWithFilter(sortField SortField, sortOrder SortOrder, pageLimit, pageIndex int, filter []clause.Expression) ([]*mod.User, int64, error) {
 	var users []*mod.User
 	var count int64
-	var err error
+	//var err error
 
 	if pageLimit <= 0 {
 		pageLimit = DefaultPageLimit
@@ -386,11 +388,11 @@ func (repo UserRepository) getAllUsersAndCountWithFilter(sortField SortField, so
 	if queryResult.Error != nil {
 		return nil, 0, queryResult.Error
 	}
-	if err != nil {
-		return nil, 0, err
-	}
+	//if err != nil {
+	//	return nil, 0, err
+	//}
 
-	return users, count, err
+	return users, count, nil
 }
 
 // RetrieveUsersByFilters ...
@@ -521,10 +523,10 @@ func (repo UserRepository) createUser(user *mod.User) error {
 
 	if user.UUID == "" {
 		theUUID, err := uuid.NewRandom()
-		user.UUID = theUUID.String()
 		if err != nil {
 			return err
 		}
+		user.UUID = theUUID.String()
 	}
 
 	//// check model
@@ -564,6 +566,10 @@ func (repo UserRepository) updateUser(userID string, user *mod.User) error {
 	logTime := time.Now().UTC()
 	user.UpdatedAt = logTime
 
+	if user.UUID != userID {
+		return fmt.Errorf("db error: UUID changed")
+	}
+
 	// insert to database
 	queryResult := repo.databaseSession.Save(user)
 	if queryResult.Error != nil {
@@ -592,9 +598,9 @@ func (repo UserRepository) deleteUser(userIDs ...string) error {
 	return nil
 
 	// userMemCache.Remove(userID)
-	userMemCache.Purge()
-
-	return nil
+	//userMemCache.Purge()
+	//
+	//return nil
 }
 
 //func (repo UserRepository) retrieveRoles() ([]*mod.Role, error) {
@@ -615,16 +621,16 @@ func (repo UserRepository) deleteUser(userIDs ...string) error {
 
 func (repo UserRepository) retrieveRolesByRoleNames(roleNames ...string) ([]*mod.Role, error) {
 	var roles []*mod.Role
-	var err error
+	//var err error
 
 	queryResult := repo.databaseSession.Preload(clause.Associations).Find(&roles, gormutils.GetQueryWhereIn(repo.databaseSession, roleNameFieldName, roleNames))
 	if queryResult.Error != nil {
 		return nil, errors.WithMessage(queryResult.Error, "db error")
 	}
 
-	if err != nil {
-		return nil, err
-	}
+	//if err != nil {
+	//	return nil, err
+	//}
 
 	repo.cacheRoles(roles...)
 
@@ -640,10 +646,10 @@ func (repo UserRepository) createRole(role *mod.Role) error {
 
 	if role.UUID == "" {
 		theUUID, err := uuid.NewRandom()
-		role.UUID = theUUID.String()
 		if err != nil {
 			return err
 		}
+		role.UUID = theUUID.String()
 	}
 
 	//// check model
@@ -677,10 +683,10 @@ func (repo UserRepository) UpdateRole(roleID string, role *mod.Role) error {
 
 	if role.UUID == "" {
 		theUUID, err := uuid.NewRandom()
-		role.UUID = theUUID.String()
 		if err != nil {
 			return err
 		}
+		role.UUID = theUUID.String()
 	}
 
 	//// check model
@@ -691,6 +697,10 @@ func (repo UserRepository) UpdateRole(roleID string, role *mod.Role) error {
 
 	logTime := time.Now().UTC()
 	role.UpdatedAt = logTime
+
+	if role.UUID != roleID {
+		return fmt.Errorf("db error: UUID changed")
+	}
 
 	// insert to database
 	queryResult := repo.databaseSession.Save(role)
