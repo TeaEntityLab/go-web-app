@@ -32,9 +32,9 @@ func GetHttpRequestInfo(r *fasthttp.RequestCtx) *model.HTTPRequestInfo {
 // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#HttpRequest
 func NewHttpLogger(logger *logrus.Entry, r *fasthttp.RequestCtx) *logrus.Entry {
 	return logger.WithField("httpRequest", map[string]interface{}{
-		"requestMethod": r.Method,
-		"requestUrl":    r.RequestURI,
-		"requestSize":   r.Request.Header.ContentLength,
+		"requestMethod": string(r.Method()),
+		"requestUrl":    string(r.RequestURI()),
+		"requestSize":   r.Request.Header.ContentLength(),
 		//"status": number,
 		//"responseSize": string,
 		"userAgent": string(r.UserAgent()),
