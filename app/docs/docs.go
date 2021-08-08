@@ -176,9 +176,6 @@ var doc = `{
         "model.AuthLogin": {
             "type": "object",
             "properties": {
-                "account_name": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },

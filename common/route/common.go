@@ -18,11 +18,11 @@ var (
 )
 
 type CachedOrganizationInfoForPermission struct {
-	AccountID string
+	TenantID string
 }
 
-func generateAccountKeyForCache(accountID string) string {
-	return fmt.Sprintf("account_%s", accountID)
+func generateTenantKeyForCache(TenantID string) string {
+	return fmt.Sprintf("Tenant_%s", TenantID)
 }
 
 func getCachedOrganizationInfoForPermissionOrUpdateIt(key string, getInfo func() *CachedOrganizationInfoForPermission) *CachedOrganizationInfoForPermission {
