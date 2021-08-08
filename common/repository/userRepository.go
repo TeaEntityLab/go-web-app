@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	lru "go-web-app/thirdparty/golang-lru"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
@@ -18,8 +17,8 @@ import (
 )
 
 var (
-	roleMemCache *lru.CacheWithExpiration = InitCacheWithSizeAndExpiration(100, 10*time.Minute)
-	userMemCache *lru.CacheWithExpiration = InitCacheWithSize(100)
+	roleMemCache = InitCacheWithSizeAndExpiration(100, 10*time.Minute)
+	userMemCache = InitCacheWithSize(100)
 )
 
 const (
