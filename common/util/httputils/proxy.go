@@ -2,6 +2,7 @@ package ginutils
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
@@ -9,12 +10,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
 )
 
 func ReverseProxy(target string) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(c *fasthttp.RequestCtx) {
 		//director := func(req *http.Request) {
 		//	r := c.Request
 		//	req = r
@@ -63,7 +64,7 @@ func ReverseProxyCustomV2(target *url.URL) *httputil.ReverseProxy {
 }
 
 //func ReverseProxyCustomV1(target string) gin.HandlerFunc {
-//	return func(c *gin.Context) {
+//	return func(c *fasthttp.RequestCtx) {
 //		reverseProxyCustomV1(target, c.Writer, c.Request)
 //	}
 //}

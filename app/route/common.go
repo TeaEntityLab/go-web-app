@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
+	"github.com/valyala/fasthttp"
 	"github.com/sirupsen/logrus"
 
 	mod "go-web-app/common/model"
 	repo "go-web-app/common/repository"
-	"go-web-app/common/util/ginutils"
+	"go-web-app/common/util/httputils"
 )
 
 const (
@@ -65,7 +65,7 @@ type CommonErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func checkModelErrorOrAbort(c *gin.Context, funcLogger *logrus.Entry, requestId string, authToken *mod.AuthToken, modelError error) bool {
+func checkModelErrorOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, requestId string, authToken *mod.AuthToken, modelError error) bool {
 	if modelError != nil {
 		httpStatus := http.StatusInternalServerError
 		code := 500

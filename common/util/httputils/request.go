@@ -6,8 +6,8 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
 
 	"go-web-app/common/model"
 	authService "go-web-app/common/service/auth"
@@ -51,7 +51,7 @@ func NewHttpLogger(logger *logrus.Entry, r *http.Request) *logrus.Entry {
 }
 
 // TryGetCookie ...
-func TryGetCookie(c *gin.Context, name string) (string, error) {
+func TryGetCookie(c *fasthttp.RequestCtx, name string) (string, error) {
 	targetCookie, cookieTokenErr := c.Request.Cookie(name)
 	if cookieTokenErr != nil {
 		return "", cookieTokenErr
@@ -67,7 +67,7 @@ func TryGetCookie(c *gin.Context, name string) (string, error) {
 }
 
 // CheckLoginStatus ...
-func CheckLoginStatus(c *gin.Context) (*model.AuthToken, *errtrace.Error) {
+func CheckLoginStatus(c *fasthttp.RequestCtx) (*model.AuthToken, *errtrace.Error) {
 	authTokenJWTString := GetBearerAuthTokenString(c)
 	if authService.DebugMode {
 		fmt.Println("Auth:", authTokenJWTString)
@@ -127,15 +127,15 @@ func CheckLoginStatus(c *gin.Context) (*model.AuthToken, *errtrace.Error) {
 	return authToken, nil
 }
 
-func GetBearerAuthTokenString(c *gin.Context) string {
-	str := c.Request.Header.Get(authService.HeaderAuthBearerKey)
+func GetBearerAuthTokenString(c *fasthttp.RequestCtx) string {
+	str := string(c.Request.Header.Peek(authService.HeaderAuthBearerKey))
 	if idx := strings.Index(str, authService.HeaderAuthBearerPrefix); idx != -1 {
 		str = str[idx+authService.HeaderAuthBearerPrefixLen:]
 	}
 	return str
 }
 
-func CheckLoginStatusOrAbort(c *gin.Context, funcLogger *logrus.Entry, messageOnError string) (*model.AuthToken, *errtrace.Error) {
+func CheckLoginStatusOrAbort(c *fasthttp.RequestCtx, funcLogger *logrus.Entry, messageOnError string) (*model.AuthToken, *errtrace.Error) {
 	authToken, checkLoginErr := CheckLoginStatus(c)
 
 	if checkLoginErr != nil || authToken == nil {

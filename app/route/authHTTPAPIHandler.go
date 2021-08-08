@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
+	jsoniter "github.com/json-iterator/go"
+	"github.com/valyala/fasthttp"
 	// "github.com/pkg/errors"
 	"github.com/rs/xid"
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,7 @@ import (
 	"go-web-app/common/model"
 	repo "go-web-app/common/repository"
 	authService "go-web-app/common/service/auth"
-	"go-web-app/common/util/ginutils"
+	"go-web-app/common/util/httputils"
 )
 
 type CommonTokenResponse struct {
@@ -35,30 +36,32 @@ type CommonTokenResponse struct {
 // @Failure 500 {object} CommonErrorResponse
 // @Failure default {object} CommonErrorResponse
 // @Router /api/v1/auth/login [post]
-func CheckUsernamePasswordHTTPAPIHandler(c *gin.Context) {
+func CheckUsernamePasswordHTTPAPIHandler(c *fasthttp.RequestCtx) {
 	requestXID := xid.New().String()
-	funcLogger := ginutils.NewHttpLogger(Logger, c.Request).
+	funcLogger := httputils.NewHttpLogger(Logger, c).
 		WithField("requestXID", requestXID).
 		WithField("func", "dashboard-backend.CheckUsernamePasswordHTTPAPIHandler")
 
-	dbClient := c.MustGet("dbClient").(*gorm.DB)
+	dbClient := c.UserValue("dbClient").(*gorm.DB)
 
 	userRepo := repo.NewUserRepository(dbClient)
 
 	// appKey := c.Params.ByName("appKey")
 
 	auth := model.AuthLogin{}
-	formErr := c.BindJSON(&auth)
+	body := c.PostBody()
+	//formErr := c.BindJSON(&auth)
+	formErr := jsoniter.Unmarshal(body, &auth)
 	if formErr != nil || (!authService.CheckAuthInfoValidation(&auth)) {
 
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginInfoInsufficient,
 			"The auth infos from the form is not enough",
 			formErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":    ginutils.ReadUserIP(c.Request),
+			"ip":    httputils.ReadUserIP(c),
 			"error": response.Error(),
 		}).Infof("JSON binding error")
 
@@ -67,14 +70,14 @@ func CheckUsernamePasswordHTTPAPIHandler(c *gin.Context) {
 
 	user, getUserErr := userRepo.RetrieveUserByUserName(true, auth.UserName)
 	if getUserErr != nil || user == nil {
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginUsernameNotFound,
 			"User not found",
 			getUserErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":    ginutils.ReadUserIP(c.Request),
+			"ip":    httputils.ReadUserIP(c),
 			"error": response.Error(),
 		}).Infof("db error")
 
@@ -83,14 +86,14 @@ func CheckUsernamePasswordHTTPAPIHandler(c *gin.Context) {
 
 	loginErr := authService.CheckLoginUserNamePassword(auth.Password, user.Password)
 	if loginErr != nil {
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginPasswordNotMatching,
 			"Password is not matching the one in the database",
 			loginErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":    ginutils.ReadUserIP(c.Request),
+			"ip":    httputils.ReadUserIP(c),
 			"error": response.Error(),
 		}).Infof("login error")
 
@@ -99,23 +102,34 @@ func CheckUsernamePasswordHTTPAPIHandler(c *gin.Context) {
 
 	token, tokenErr := authService.GenerateJWTTokenForUser(user)
 	if tokenErr != nil {
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginInfoInsufficient,
 			fmt.Sprintf("Token generation errors: %v", tokenErr.Error()),
 			tokenErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":    ginutils.ReadUserIP(c.Request),
+			"ip":    httputils.ReadUserIP(c),
 			"error": response.Error(),
 		}).Infof("jwt token error")
 
 		return
 	}
 
-	c.SetCookie(authService.KeyCookieToken, token, 3600, "/", c.Request.URL.Host, true, true)
+	cookie := fasthttp.Cookie{}
+	cookie.SetKey(authService.KeyCookieToken)
+	cookie.SetValue(token)
+	cookie.SetMaxAge(3600)
+	cookie.SetPath("/")
+	cookie.SetDomain(string(c.Request.URI().Host()))
+	cookie.SetSecure(true)
+	cookie.SetHTTPOnly(true)
+	c.Response.Header.SetCookie(&cookie)
+	//cookie.SetExpire(time.Now().Add(3600 * time.Second))
+	//cookie.SetSameSite(fasthttp.CookieSameSiteDefaultMode)
+	//c.Response.Header.SetCookie(authService.KeyCookieToken, token, 3600, "/", c.Request.URI().Host(), true, true)
 
-	c.JSON(http.StatusOK, CommonTokenResponse{
+	httputils.DoJSONWrite(c, http.StatusOK, CommonTokenResponse{
 		Token: token,
 		Title: "success",
 
@@ -138,17 +152,17 @@ func CheckUsernamePasswordHTTPAPIHandler(c *gin.Context) {
 // @Failure 500 {object} CommonErrorResponse
 // @Failure default {object} CommonErrorResponse
 // @Router /api/v1/auth/renew [post]
-func RenewAuthTokenHTTPAPIHandler(c *gin.Context) {
+func RenewAuthTokenHTTPAPIHandler(c *fasthttp.RequestCtx) {
 	requestXID := xid.New().String()
-	funcLogger := ginutils.NewHttpLogger(Logger, c.Request).
+	funcLogger := httputils.NewHttpLogger(Logger, c).
 		WithField("requestXID", requestXID).
 		WithField("func", "dashboard-backend.RenewAuthTokenHTTPAPIHandler")
 
-	dbClient := c.MustGet("dbClient").(*gorm.DB)
+	dbClient := c.UserValue("dbClient").(*gorm.DB)
 
 	userRepo := repo.NewUserRepository(dbClient)
 
-	authToken, checkLoginErr := ginutils.CheckLoginStatusOrAbort(c, funcLogger, "CheckLoginStatusOrAbort error")
+	authToken, checkLoginErr := httputils.CheckLoginStatusOrAbort(c, funcLogger, "CheckLoginStatusOrAbort error")
 	if checkLoginErr != nil || authToken == nil {
 		return
 	}
@@ -159,14 +173,14 @@ func RenewAuthTokenHTTPAPIHandler(c *gin.Context) {
 		user = users[0]
 	}
 	if getUserErr != nil || user == nil {
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginUsernameNotFound,
 			"User not found",
 			getUserErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":        ginutils.ReadUserIP(c.Request),
+			"ip":        httputils.ReadUserIP(c),
 			"authToken": authToken,
 			"error":     response.Error(),
 		}).Errorf("db error")
@@ -176,14 +190,14 @@ func RenewAuthTokenHTTPAPIHandler(c *gin.Context) {
 
 	token, tokenErr := authService.GenerateJWTTokenForUser(user)
 	if tokenErr != nil {
-		response := ginutils.ResponseAuthError(
+		response := httputils.ResponseAuthError(
 			c,
 			authService.ErrorAuthLoginInfoInsufficient,
 			fmt.Sprintf("Token generation errors: %v", tokenErr.Error()),
 			tokenErr, false)
 
 		funcLogger.WithFields(logrus.Fields{
-			"ip":        ginutils.ReadUserIP(c.Request),
+			"ip":        httputils.ReadUserIP(c),
 			"authToken": authToken,
 			"error":     response.Error(),
 		}).Errorf("jwt token error")
@@ -191,9 +205,20 @@ func RenewAuthTokenHTTPAPIHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(authService.KeyCookieToken, token, 3600, "/", c.Request.URL.Host, true, true)
+	cookie := fasthttp.Cookie{}
+	cookie.SetKey(authService.KeyCookieToken)
+	cookie.SetValue(token)
+	cookie.SetMaxAge(3600)
+	cookie.SetPath("/")
+	cookie.SetDomain(string(c.Request.URI().Host()))
+	cookie.SetSecure(true)
+	cookie.SetHTTPOnly(true)
+	c.Response.Header.SetCookie(&cookie)
+	//cookie.SetExpire(time.Now().Add(3600 * time.Second))
+	//cookie.SetSameSite(fasthttp.CookieSameSiteDefaultMode)
+	//c.Response.Header.SetCookie(authService.KeyCookieToken, token, 3600, "/", c.Request.URI().Host, true, true)
 
-	c.JSON(http.StatusOK, CommonTokenResponse{
+	httputils.DoJSONWrite(c, http.StatusOK, CommonTokenResponse{
 		Token: token,
 		Title: "success",
 

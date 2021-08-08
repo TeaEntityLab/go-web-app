@@ -2,23 +2,24 @@ package middleware
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
+
 	"github.com/rs/xid"
 	"github.com/sirupsen/logrus"
+	"github.com/valyala/fasthttp"
 
-	"go-web-app/common/util/ginutils"
+	"go-web-app/common/util/httputils"
 )
 
 // Auth general Auth checking
 func Auth(logger *logrus.Entry, exceptionalRoutes ...ExceptionalRoute) gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(c *fasthttp.RequestCtx) {
 
 		matchedPath, _ := c.Get("matchedPath")
 
 		matchedException := false
 		path := c.Request.URL.Path
-		method := c.Request.Method
+		method := string(c.Request.Header.Method())
 		for _, route := range exceptionalRoutes {
 			if (route.Path == path || route.Path == matchedPath) && route.Method == method {
 				matchedException = true

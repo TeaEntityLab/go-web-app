@@ -10,12 +10,12 @@ import (
 
 	"github.com/caarlos0/env/v6"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	"github.com/valyala/fasthttp"
+	gormLogrus "github.com/onrik/gorm-logrus"
 	"github.com/sirupsen/logrus"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	gormlogger "gorm.io/gorm/logger"
-	gormLogrus "github.com/onrik/gorm-logrus"
 
 	"go-web-app/common/middleware"
 	"go-web-app/common/repository"
@@ -47,8 +47,8 @@ var (
 type Config struct {
 	db.CommonConfig
 
-	RedisEndpoints           string `json:"REDIS_ENDPOINTS" env:"REDIS_ENDPOINTS,required"`
-	ServicePort              string `json:"SERVICE_PORT" env:"SERVICE_PORT" envDefault:"8080"`
+	RedisEndpoints string `json:"REDIS_ENDPOINTS" env:"REDIS_ENDPOINTS,required"`
+	ServicePort    string `json:"SERVICE_PORT" env:"SERVICE_PORT" envDefault:"8080"`
 
 	JwtTokenPrivateKeyPath string `json:"JWT_TOKEN_PRIVATEKEY_PATH" env:"JWT_TOKEN_PRIVATEKEY_PATH,required"`
 	JwtTokenPublicKeyPath  string `json:"JWT_TOKEN_PUBLICKEY_PATH" env:"JWT_TOKEN_PUBLICKEY_PATH,required"`
@@ -87,7 +87,7 @@ func main() {
 
 	//r.Use(static.ServeRoot("/static", "./web/static"))
 	r.Use(routeCommon.SimpleCORSMiddleware)
-	r.Use(func(c *gin.Context) {
+	r.Use(func(c *fasthttp.RequestCtx) {
 		c.Set("dbClient", db.GetDefaultDatabase())
 		c.Set("cacheStore", repository.NewCacheStoreWithRedisClient(repository.GetRedisClientDefault(cfg.RedisEndpoints)))
 		c.Next()
@@ -97,17 +97,17 @@ func main() {
 
 	//api := r.Group("/api")
 
-	r.POST("/operation/ensureIndex", func(context *gin.Context) {
+	r.POST("/operation/ensureIndex", func(context *fasthttp.RequestCtx) {
 		repository.Init(db.GetDefaultDatabase())
 	})
 
 	// Docker/Kubernetes health check
-	r.GET("/healthz", func(c *gin.Context) {
+	r.GET("/healthz", func(c *fasthttp.RequestCtx) {
 		c.String(http.StatusOK, http.StatusText(http.StatusOK))
 	})
 
 	// Default Kubernetes L7 Loadbalancing health check
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/", func(c *fasthttp.RequestCtx) {
 		c.String(http.StatusOK, http.StatusText(http.StatusOK))
 	})
 
@@ -129,7 +129,7 @@ func main() {
 		r.GET(cfg.DocumentRouteGroup+"/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
-	//r.GET("/proxy/*url", func(c *gin.Context) {
+	//r.GET("/proxy/*url", func(c *fasthttp.RequestCtx) {
 	//	target := strings.TrimPrefix(c.Params.ByName("url"), "/")
 	//	ginutils.ReverseProxy(target)(c)
 	//})

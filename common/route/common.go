@@ -6,11 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/valyala/fasthttp"
 	// log "github.com/sirupsen/logrus"
 	lru "go-web-app/thirdparty/golang-lru"
-
-	// "go-web-app/common/util/ginutils"
+	// "go-web-app/common/util/httputils"
 )
 
 var (
@@ -83,26 +82,26 @@ var (
 	}, ", ")
 )
 
-func SimpleCORSMiddleware(c *gin.Context) {
+func SimpleCORSMiddleware(c *fasthttp.RequestCtx) {
 	// If a request may contain a `Access-Control-Allow-Origin` with different values, then the host should always respond with `Vary: Origin`,
 	// even for responses without an `Access-Control-Allow-Origin` header.
 	// If the header isn't always present, it would be possible to fill the cache with incorrect values.
-	c.Writer.Header().Add("Vary", "Origin")
+	c.Response.Header.Add("Vary", "Origin")
 
 	// cors setting
-	origin := c.Request.Header.Get("Origin")
+	origin := string(c.Request.Header.Peek("Origin"))
 	if origin == "" {
 		origin = "*"
 	}
-	c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+	c.Response.Header.Set("Access-Control-Allow-Origin", origin)
 
-	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-	c.Writer.Header().Set("Access-Control-Allow-Methods", AccessControlAllowMethods)
-	c.Writer.Header().Set("Access-Control-Allow-Headers", AccessControlAllowHeaders)
-	c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Response.Header.Set("Access-Control-Max-Age", "86400")
+	c.Response.Header.Set("Access-Control-Allow-Methods", AccessControlAllowMethods)
+	c.Response.Header.Set("Access-Control-Allow-Headers", AccessControlAllowHeaders)
+	c.Response.Header.Set("Access-Control-Expose-Headers", "Content-Length")
+	c.Response.Header.Set("Access-Control-Allow-Credentials", "true")
 
-	if c.Request.Method == http.MethodOptions {
+	if string(c.Request.Header.Method()) == http.MethodOptions {
 		c.AbortWithStatus(200)
 	} else {
 		c.Next()
