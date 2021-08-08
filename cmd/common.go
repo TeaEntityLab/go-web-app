@@ -20,6 +20,7 @@ type TemplateReplaceDef struct {
 	targetPath   string
 }
 
+// ReplaceTemplate Replace the template file content variables.
 func ReplaceTemplate(templateList []TemplateReplaceDef, replaceFunc func(string) string) error {
 	var err error
 	for _, item := range templateList {
@@ -42,6 +43,7 @@ func ReplaceTemplate(templateList []TemplateReplaceDef, replaceFunc func(string)
 	return nil
 }
 
+// InitDatabase Init the database as possible.
 func InitDatabase(c *cli.Context, funcLogger *logrus.Entry) error {
 	var envParseErr error
 	cfg := db.CommonConfig{}
