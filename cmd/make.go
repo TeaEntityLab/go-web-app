@@ -37,14 +37,7 @@ var (
 						targetPath:   "common/model/" + modelName + ".go",
 					},
 				}
-				err = ReplaceTemplate(templateList, func(content string) string {
-					content = strings.Replace(content, "{{datetime}}", datetime, -1)
-					content = strings.Replace(content, "{{datetimeRaw}}", datetimeRaw, -1)
-					content = strings.Replace(content, "{{actionName}}", actionName, -1)
-					content = strings.Replace(content, "{{modelName}}", modelName, -1)
-
-					return content
-				})
+				err = MakeGeneral(templateList, datetime, datetimeRaw, actionName, "modelName", modelName)
 				if err != nil {
 					return err
 				}
@@ -77,14 +70,7 @@ var (
 						targetPath:   migration.GetMigrationFileName(datetime, actionName, migrationName),
 					},
 				}
-				err = ReplaceTemplate(templateList, func(content string) string {
-					content = strings.Replace(content, "{{datetime}}", datetime, -1)
-					content = strings.Replace(content, "{{datetimeRaw}}", datetimeRaw, -1)
-					content = strings.Replace(content, "{{actionName}}", actionName, -1)
-					content = strings.Replace(content, "{{migrationName}}", migrationName, -1)
-
-					return content
-				})
+				err = MakeGeneral(templateList, datetime, datetimeRaw, actionName, "migrationName", migrationName)
 				if err != nil {
 					return err
 				}
@@ -117,14 +103,7 @@ var (
 						targetPath:   seeder.GetSeederFileName(datetime, actionName, seederName),
 					},
 				}
-				err = ReplaceTemplate(templateList, func(content string) string {
-					content = strings.Replace(content, "{{datetime}}", datetime, -1)
-					content = strings.Replace(content, "{{datetimeRaw}}", datetimeRaw, -1)
-					content = strings.Replace(content, "{{actionName}}", actionName, -1)
-					content = strings.Replace(content, "{{seederName}}", seederName, -1)
-
-					return content
-				})
+				err = MakeGeneral(templateList, datetime, datetimeRaw, actionName, "seederName", seederName)
 				if err != nil {
 					return err
 				}
@@ -139,3 +118,14 @@ var (
 		},
 	}
 )
+
+func MakeGeneral(templateList []TemplateReplaceDef, datetime string, datetimeRaw string, actionName string, objectNameFieldName string, objectName string) error {
+	return ReplaceTemplate(templateList, func(content string) string {
+		content = strings.Replace(content, "{{datetime}}", datetime, -1)
+		content = strings.Replace(content, "{{datetimeRaw}}", datetimeRaw, -1)
+		content = strings.Replace(content, "{{actionName}}", actionName, -1)
+		content = strings.Replace(content, "{{"+objectNameFieldName+"}}", objectName, -1)
+
+		return content
+	})
+}
