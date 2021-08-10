@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"unicode"
 )
@@ -51,9 +52,38 @@ func IsASCII(s string) bool {
 	return true
 }
 
+func IsNumericASCII(r int32) bool {
+	if r < '0' || r > '9' {
+		return false
+	}
+	return true
+}
+
+func IsAlphabetASCII(r int32) bool {
+	if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+		return false
+	}
+	return true
+}
+
 func StrOrDefault(in *string) string {
 	if in == nil {
 		return ""
 	}
 	return *in
+}
+
+func HtmlNumericCharacterReference(origin string) string {
+	var b strings.Builder
+	b.Grow(len(origin)*9)
+
+	for _, r := range []rune(origin) {
+		if IsAlphabetASCII(r) || IsNumericASCII(r) {
+			b.WriteRune(r)
+	 	} else {
+	 		b.WriteString("&#x"+strconv.FormatInt(int64(r),16)+";")
+		}
+	}
+
+	return b.String()
 }
