@@ -3,7 +3,7 @@ package serviceAuth
 import (
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 
 	mod "go-web-app/common/model"

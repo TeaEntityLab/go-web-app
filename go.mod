@@ -6,9 +6,9 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/caarlos0/env/v6 v6.5.0
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.0.0
 	github.com/johntdyer/slack-go v0.0.0-20180213144715-95fac1160b22
