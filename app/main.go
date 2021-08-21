@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v6"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 	"github.com/fasthttp/router"
 	gormLogrus "github.com/onrik/gorm-logrus"
 	"github.com/sirupsen/logrus"

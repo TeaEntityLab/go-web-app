@@ -74,7 +74,7 @@ DB_ENDPOINTS=mydb.sqlite3 DB_TYPE=sqlite ./cli.sh seed
 ## WSGI/Routing/Auth
 
 * Auth
-	* JWT (Auth Token) https://github.com/dgrijalva/jwt-go
+	* JWT (Auth Token) https://github.com/golang-jwt/jwt
 	* Crypto cypto "golang.org/x/crypto"
 * Env (as Config structs) env "github.com/caarlos0/env/v6"
 * ORM (GORM) https://gorm.io/gorm
