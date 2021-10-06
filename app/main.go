@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v6"
-	"github.com/golang-jwt/jwt"
 	"github.com/fasthttp/router"
+	"github.com/golang-jwt/jwt"
 	gormLogrus "github.com/onrik/gorm-logrus"
 	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -98,7 +98,7 @@ func main() {
 		}
 	}
 	commonMiddlewares := func(next fasthttp.RequestHandler) fasthttp.RequestHandler {
-		return middleware.Pipe(next, routeCommon.SimpleCORSMiddleware, utilsMiddleware)
+		return middleware.Pipe(next, utilsMiddleware)
 	}
 
 	// GeneralAPI router group
@@ -157,7 +157,7 @@ func main() {
 		fmt.Sprintf(
 			"%s:%s", cfg.HostName, cfg.ServicePort,
 		),
-		r.Handler,
+		routeCommon.SimpleCORSMiddleware(r.Handler),
 	)
 
 	if serviceErr != nil {

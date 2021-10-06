@@ -45,6 +45,12 @@ func responseError(c *fasthttp.RequestCtx, response errtrace.Error) errtrace.Err
 	return response
 }
 
+func DoDataWriteWithContentType(ctx *fasthttp.RequestCtx, code int, contentType string, data []byte) {
+	ctx.Response.Header.SetCanonical(StrContentType, []byte(contentType))
+	ctx.Response.SetStatusCode(code)
+	ctx.Write(data)
+}
+
 func DoJSONWrite(ctx *fasthttp.RequestCtx, code int, obj interface{}) {
 	ctx.Response.Header.SetCanonical(StrContentType, StrApplicationJSON)
 	ctx.Response.SetStatusCode(code)
