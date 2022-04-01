@@ -25,9 +25,9 @@ require (
 	github.com/swaggo/http-swagger v1.1.1
 	github.com/swaggo/swag v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/valyala/fasthttp v1.28.0
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/net v0.0.0-20210510120150-4163338589ed
+	github.com/valyala/fasthttp v1.34.0
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	gopkg.in/redis.v5 v5.2.9
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.1.0
