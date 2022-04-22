@@ -22,8 +22,8 @@ require (
 	github.com/sergi/go-diff v1.2.0
 	github.com/serialx/hashring v0.0.0-20200727003509-22c0c7ab6b1b
 	github.com/sirupsen/logrus v1.8.1
-	github.com/swaggo/http-swagger v1.1.1
-	github.com/swaggo/swag v1.7.0
+	github.com/swaggo/http-swagger v1.2.6
+	github.com/swaggo/swag v1.7.9
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/valyala/fasthttp v1.34.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
