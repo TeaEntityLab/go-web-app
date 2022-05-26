@@ -29,6 +29,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	gopkg.in/redis.v5 v5.2.9
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 	gorm.io/driver/mysql v1.0.5
 	gorm.io/driver/postgres v1.1.0
 	gorm.io/driver/sqlite v1.1.1
