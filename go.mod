@@ -26,8 +26,8 @@ require (
 	github.com/swaggo/swag v1.7.9
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/valyala/fasthttp v1.34.0
-	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
-	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
+	golang.org/x/crypto v0.1.0
+	golang.org/x/net v0.1.0
 	gopkg.in/redis.v5 v5.2.9
 	gopkg.in/yaml.v3 v3.0.0 // indirect
 	gorm.io/driver/mysql v1.0.5
